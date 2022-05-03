@@ -6,7 +6,7 @@ We consider the situation in which a NFT artist would like to sell a collection 
 
 In a persistent English auction, the auctioneer decides the rate at which NFTs should be sold at e.g 1 NFT per hour. Whilst the auction is active, potential buyers can register bids. In theory, at the end of every hour (a clearing round), a sale is made to the highest bidder. This is done until all pieces are sold.
 
-Lazy evaluation is used to amortise the cost of operating the auction. Before a bid is made, the time gap between the previous transaction is calculated to see if any previous clearing rounds need to be processed. This is inspired by the concept of virtual orders used in [TWAMMs](https://www.paradigm.xyz/2021/07/twamm#the-time-weighted-average-market-maker).
+Lazy evaluation is used to amortise the cost of operating the auction on the blockchain. Before a bid is made, the time gap between the previous transaction is calculated to see if any previous clearing rounds need to be processed. This is inspired by the concept of virtual orders used in [TWAMMs](https://www.paradigm.xyz/2021/07/twamm#the-time-weighted-average-market-maker).
 
 Upon auction close, participants can mint their NFTs and/or claim their funds from unsuccessful bids.
 
