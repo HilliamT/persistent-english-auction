@@ -13,9 +13,7 @@ Upon auction close, participants can mint their NFTs or claim their funds from u
 ## Getting Started
 
 ```
-mkdir my-project
-cd my-project
-forge init --template https://github.com/FrankieIsLost/forge-template
+git clone https://github.com/HilliamT/persistent-english-auction.git
 git submodule update --init --recursive  ## initialize submodule dependencies
 npm install ## install development dependencies
 forge build
