@@ -35,4 +35,5 @@ forge test
 Below are a list of helpful resources that have helped me develop this idea.
 
 - [A Guide to Designing Effective NFT Launches](https://www.paradigm.xyz/2021/10/a-guide-to-designing-effective-nft-launches)
+- [FrankieIsLost/gradual-dutch-auction](https://github.com/FrankieIsLost/gradual-dutch-auction)
 - [TWAMMs - Virtual Orders](https://www.paradigm.xyz/2021/07/twamm#the-time-weighted-average-market-maker)
