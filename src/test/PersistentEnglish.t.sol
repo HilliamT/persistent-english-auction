@@ -11,7 +11,7 @@ contract PersistentEnglishTest is DSTest {
 
     MockPersistentEnglish internal auction;
     uint32 TOTAL_TO_SELL = 3;
-    uint32 TIME_BETWEEN_SELLS = 1;
+    uint32 TIME_BETWEEN_SELLS = 2;
 
     function setUp() public {
         auction = new MockPersistentEnglish(
@@ -77,7 +77,7 @@ contract PersistentEnglishTest is DSTest {
         auction.bid{value: 0.02 ether}();
         assertEq(auction.noOfBids(), 2);
 
-        vm.warp(TIME_BETWEEN_SELLS * 2);
+        vm.warp((TIME_BETWEEN_SELLS * 5) / 2);
 
         auction.bid{value: 0.03 ether}();
 
