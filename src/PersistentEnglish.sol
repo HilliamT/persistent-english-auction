@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity >=0.8.0;
 
+import {ERC721} from "solmate/tokens/ERC721.sol";
 import {Ownable} from "openzeppelin-contracts/access/Ownable.sol";
 
-contract PersistentEnglish is Ownable {
+abstract contract PersistentEnglish is Ownable, ERC721 {
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
@@ -40,7 +41,12 @@ contract PersistentEnglish is Ownable {
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(uint32 _totalToSell, uint32 _timeBetweenSells) {
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        uint32 _totalToSell,
+        uint32 _timeBetweenSells
+    ) ERC721(_name, _symbol) {
         auctionStartTime = uint256(block.timestamp);
         totalToSell = _totalToSell;
         timeBetweenSells = _timeBetweenSells;
