@@ -5,6 +5,7 @@
         "editor.defaultFormatter": "JuanBlanco.solidity"
     },
     "conventionalCommits.scopes": [
-        "contract"
+        "contract",
+        "simulation"
     ]
 }
