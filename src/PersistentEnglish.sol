@@ -167,8 +167,8 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         bids.push(Bid(bidder, bidAmount));
     }
 
-    ///@notice Extract the largest bid
-    function _takeTopBid() private {
+    ///@notice Get winning index for the bid to be sold to next
+    function _getWinningIndex() private view returns (uint256) {
         // find the highest bid made across all bids
         uint256 winningIndex = 0;
         uint256 highestAmount = 0;
@@ -178,6 +178,13 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
                 highestAmount = bids[i].amount;
             }
         }
+
+        return winningIndex;
+    }
+
+    ///@notice Extract the largest bid
+    function _takeTopBid() private {
+        uint256 winningIndex = _getWinningIndex();
 
         // remove the highest bid from the list by replacing it with the last bid
         Bid memory winningBid = bids[winningIndex];
