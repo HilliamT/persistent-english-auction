@@ -10,6 +10,8 @@ Lazy evaluation is used to amortise the cost of operating the auction on the blo
 
 Upon auction close, participants can mint their NFTs and/or claim their funds from unsuccessful bids.
 
+The structure of this repository is heavily alike to [**@FrankieIsLost**](https://github.com/FrankieIsLost)'s [Gradual Dutch Auctions](https://github.com/FrankieIsLost/gradual-dutch-auction/) repository - the repository has formed a good basis for the development of this project.
+
 ## Getting Started
 
 ```
