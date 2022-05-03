@@ -24,14 +24,14 @@ forge test
 ## Changes to Make
 
 ### Contract
-- [] Contract should be made abstract. This will require updating the usage of the contract in tests.
-- [] Contract can be a `ERC721` itself.
-- [] Currently, when the auction is to close, the last NFT does not get allocated to a bidder until the auction operator calls `closeAuction`. This also prevents minting and refunds to be processed as only the operator can make the auction inactive. This is not ideal.
-- [] Fuzzing
+- [ ] Contract should be made abstract. This will require updating the usage of the contract in tests.
+- [ ] Contract can be a `ERC721` itself.
+- [ ] Currently, when the auction is to close, the last NFT does not get allocated to a bidder until the auction operator calls `closeAuction`. This also prevents minting and refunds to be processed as only the operator can make the auction inactive. This is not ideal.
+- [ ] Fuzzing
 ### Simulation
-- [] Translate updated contract logic into simulated class
-- [] Simulate bids being made at random intervals via distribution
-- [] Compute revenue and potential maximum revenue
+- [ ] Translate updated contract logic into simulated class
+- [ ] Simulate bids being made at random intervals via distribution
+- [ ] Compute revenue and potential maximum revenue
 
 ## Resources
 Below are a list of helpful resources that have helped me develop this idea.
