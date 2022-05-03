@@ -8,7 +8,7 @@ contract PersistentEnglish is Ownable {
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
 
-    event AuctionSale(address indexed seller, uint256 value);
+    event AuctionSale(address indexed bidder, uint256 winningBid);
 
     /*//////////////////////////////////////////////////////////////
                                  STRUCTS
