@@ -6,9 +6,9 @@ We consider the situation in which a NFT artist would like to sell a collection 
 
 In a persistent English auction, the auctioneer decides the rate at which NFTs should be sold at e.g 1 NFT per hour. Whilst the auction is active, potential buyers can register bids. In theory, at the end of every hour (a clearing round), a sale is made to the highest bidder until all pieces are sold.
 
-Lazy evaluation is used to amortise the cost of operating the auction. Before a bid is made, the time gap between the previous transaction is calculated to see if any previous clearing rounds need to be processed. This approach is inspired by the concept of `virtual orders` used in [TWAMMs](https://www.paradigm.xyz/2021/07/twamm#the-time-weighted-average-market-maker).
+Lazy evaluation is used to amortise the cost of operating the auction. Before a bid is made, the time gap between the previous transaction is calculated to see if any previous clearing rounds need to be processed. This is inspired by the concept of `virtual orders` used in [TWAMMs](https://www.paradigm.xyz/2021/07/twamm#the-time-weighted-average-market-maker).
 
-Upon auction close, participants can mint their NFTs or claim their funds of unsuccessful bids.
+Upon auction close, participants can mint their NFTs or claim their funds from unsuccessful bids.
 
 ## Getting Started
 
@@ -21,34 +21,20 @@ npm install ## install development dependencies
 forge build
 forge test
 ```
+## Changes to Make
 
-## Features
+### Contract
+- [] Contract should be made abstract. This will require updating the usage of the contract in tests.
+- [] Contract can be a `ERC721` itself.
+- [] Currently, when the auction is to close, the last NFT does not get allocated to a bidder until the auction operator calls `closeAuction`. This also prevents minting and refunds to be processed as only the operator can make the auction inactive. This is not ideal.
+- [] Fuzzing
+### Simulation
+- [] Translate updated contract logic into simulated class
+- [] Simulate bids being made at random intervals via distribution
+- [] Compute revenue and potential maximum revenue
 
-### Testing Utilities
+## Resources
+Below are a list of helpful resources that have helped me develop this idea.
 
-Includes a `Utilities.sol` contract with common testing methods (like creating users with an initial balance), as well as various other utility contracts.
-
-### Preinstalled dependencies
-
-`ds-test` for testing, `forge-std` for better cheatcode UX, and `solmate` for optimized contract implementations.  
-
-### Linting
-
-Pre-configured `solhint` and `prettier-plugin-solidity`. Can be run by
-
-```
-npm run solhint
-npm run prettier
-```
-
-### CI with Github Actions
-
-Automatically run linting and tests on pull requests.
-
-### Default Configuration
-
-Including `.gitignore`, `.vscode`, `remappings.txt`
-
-## Acknowledgement
-
-Inspired by great dapptools templates like https://github.com/gakonst/forge-template, https://github.com/gakonst/dapptools-template and https://github.com/transmissions11/dapptools-template
+- [A Guide to Designing Effective NFT Launches](https://www.paradigm.xyz/2021/10/a-guide-to-designing-effective-nft-launches)
+- [TWAMMs - Virtual Orders](https://www.paradigm.xyz/2021/07/twamm#the-time-weighted-average-market-maker)
