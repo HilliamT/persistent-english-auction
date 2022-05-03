@@ -26,7 +26,8 @@ forge test
 ### Contract
 - [x] Contract should be made abstract. This will require updating the usage of the contract in tests.
 - [x] Contract can be a `ERC721` itself.
-- [ ] Currently, when the auction is to close, the last NFT does not get allocated to a bidder until the auction operator calls `closeAuction`. This also prevents minting and refunds to be processed as only the operator can make the auction inactive. This is not ideal.
+- [x] Currently, when the auction is to close, the last NFT does not get allocated to a bidder until the auction operator calls `closeAuction`. This also prevents minting and refunds to be processed as only the operator can make the auction inactive. This is not ideal.
+- [ ] Test view functions
 - [ ] Fuzzing
 ### Simulation
 - [ ] Translate updated contract logic into simulated class

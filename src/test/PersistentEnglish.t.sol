@@ -39,7 +39,7 @@ contract PersistentEnglishTest is DSTest {
     }
 
     function testClosingAuctionWithZeroBids() public {
-        auction.closeAuction();
+        auction.claim();
 
         assertEq(auction.noOfBids(), 0);
         assertEq(auction.totalSold(), 0);
@@ -52,7 +52,7 @@ contract PersistentEnglishTest is DSTest {
         auction.bid{value: 0.04 ether}();
         auction.bid{value: 0.05 ether}();
 
-        auction.closeAuction();
+        auction.claim();
 
         assertEq(auction.noOfBids(), 2);
         assertEq(auction.totalSold(), TOTAL_TO_SELL);
@@ -63,7 +63,7 @@ contract PersistentEnglishTest is DSTest {
         auction.bid{value: 0.01 ether}();
         auction.bid{value: 0.02 ether}();
 
-        auction.closeAuction();
+        auction.claim();
 
         assertEq(auction.noOfBids(), 0);
         assertEq(auction.totalSold(), 2);
@@ -85,4 +85,7 @@ contract PersistentEnglishTest is DSTest {
         assertEq(auction.totalSold(), 2);
         assertEq(auction.averageSale(), 0.015 ether);
     }
+
+    // Needed to accept refunds upon calling `auction.claim`
+    fallback() external payable {}
 }

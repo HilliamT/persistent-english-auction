@@ -24,11 +24,15 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
                                   STATE
     //////////////////////////////////////////////////////////////*/
 
+    ///@notice id of current ERC721 being minted
+    uint256 public currentId = 0;
+
     ///@notice All pending active bids on the auction
     Bid[] internal bids;
 
     ///@notice Amount of tokens sold to each bidder
     mapping(address => uint16) internal amountWon;
+    mapping(address => uint16) internal amountMinted;
 
     uint256 public immutable auctionStartTime;
     uint32 public immutable totalToSell;
@@ -86,33 +90,36 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         _addBid(msg.sender, msg.value);
     }
 
-    ///@notice Close the auction
-    function closeAuction() public onlyOwner {
-        require(isActive, "Auction is not active");
-
-        isActive = false;
-
+    ///@notice Claim mint and/or refund
+    function claim() public {
+        // For any unresolved clearing rounds, process
         while (bids.length > 0 && remainingToSell > 0) {
             _takeTopBid();
         }
-    }
 
-    ///@notice Claim mint and/or refund
-    function claim() public {
-        require(!isActive, "Auction is still active");
-
-        uint256 refund = 0;
-        for (uint256 i = 0; i < bids.length; i++) {
-            if (bids[i].bidder == msg.sender) {
-                refund += bids[i].amount;
+        if (
+            auctionStartTime + timeBetweenSells * totalToSell > block.timestamp
+        ) {
+            uint256 refund = 0;
+            for (uint256 i = 0; i < bids.length; i++) {
+                if (bids[i].bidder == msg.sender) {
+                    refund += bids[i].amount;
+                }
             }
+
+            // Refund the totalClaim
+            (bool sent, ) = msg.sender.call{value: refund}("");
+            require(sent, "Could not send refund");
         }
 
-        // Refund the totalClaim
-        (bool sent, ) = msg.sender.call{value: refund}("");
-        require(sent, "Could not send refund");
-
-        // TODO: mint `amountWon[msg.sender]` NFTs to `msg.sender`
+        for (
+            uint256 i = 0;
+            i < amountWon[msg.sender] - amountMinted[msg.sender];
+            i++
+        ) {
+            amountMinted[msg.sender]++;
+            _mint(msg.sender, ++currentId);
+        }
     }
 
     /*//////////////////////////////////////////////////////////////
