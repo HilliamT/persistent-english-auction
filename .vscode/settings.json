@@ -3,5 +3,8 @@
     "solidity.formatter": "prettier",
     "[solidity]": {
         "editor.defaultFormatter": "JuanBlanco.solidity"
-    }
+    },
+    "conventionalCommits.scopes": [
+        "contract"
+    ]
 }
