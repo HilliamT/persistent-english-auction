@@ -1,6 +1,14 @@
-# Forge Template
+# Persistent English Auctions
 
-A template for quickly getting started with forge
+A sequential clearing auction mechanism inspired by English auctions for maximising bid transparency and revenue.
+
+We consider the situation in which a NFT artist would like to sell a collection of NFTs. They do not know what would be a fair price and thus resort to an auction.
+
+In a persistent English auction, the auctioneer decides the rate at which NFTs should be sold at e.g 1 NFT per hour. Whilst the auction is active, potential buyers can register bids. In theory, at the end of every hour (a clearing round), a sale is made to the highest bidder until all pieces are sold.
+
+Lazy evaluation is used to amortise the cost of operating the auction. Before a bid is made, the time gap between the previous transaction is calculated to see if any previous clearing rounds need to be processed. This approach is inspired by the concept of `virtual orders` used in [TWAMMs](https://www.paradigm.xyz/2021/07/twamm#the-time-weighted-average-market-maker).
+
+Upon auction close, participants can mint their NFTs or claim their funds of unsuccessful bids.
 
 ## Getting Started
 
