@@ -34,6 +34,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
     uint32 public immutable totalToSell;
     uint32 public immutable timeBetweenSells;
 
+    uint256 public revenue;
     uint32 public remainingToSell;
     bool public isActive;
 
@@ -154,16 +155,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
             return 0;
         }
 
-        // Get balance of this smart contract
-        uint256 balance = address(this).balance;
-
-        // Subtract the total amount of bids
-        uint256 totalInBids = 0;
-        for (uint256 i = 0; i < bids.length; i++) {
-            totalInBids += bids[i].amount;
-        }
-
-        return (balance - totalInBids) / totalSold();
+        return revenue / totalSold();
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -196,6 +188,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         amountWon[winningBid.bidder]++;
         remainingToSell--;
 
+        revenue += winningBid.amount;
         emit AuctionSale(winningBid.bidder, winningBid.amount);
     }
 }
