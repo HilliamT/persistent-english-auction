@@ -38,9 +38,8 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
     uint32 public immutable totalToSell;
     uint32 public immutable timeBetweenSells;
 
-    uint256 public revenue;
     uint32 public remainingToSell;
-    bool public isActive;
+    uint256 public revenue;
 
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
@@ -57,7 +56,6 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         timeBetweenSells = _timeBetweenSells;
 
         remainingToSell = _totalToSell;
-        isActive = true;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -66,11 +64,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
 
     ///@notice Bid on the auction
     function bid() public payable {
-        require(isActive, "Auction is not active");
-        require(
-            auctionStartTime + timeBetweenSells * totalToSell > block.timestamp,
-            "Auction has ended"
-        );
+        require(isOver(), "Auction has ended");
 
         // Accept bids that will have won a previous clearing round e.g
         // If a persistent English auction is to sell NFTs at a rate of
@@ -97,9 +91,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
             _takeTopBid();
         }
 
-        if (
-            auctionStartTime + timeBetweenSells * totalToSell > block.timestamp
-        ) {
+        if (isOver()) {
             uint256 refund = 0;
             for (uint256 i = 0; i < bids.length; i++) {
                 if (bids[i].bidder == msg.sender) {
@@ -125,6 +117,12 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
     /*//////////////////////////////////////////////////////////////
                              VIEW FUNCTIONS
     //////////////////////////////////////////////////////////////*/
+
+    ///@notice Is the auction over?
+    function isOver() public view returns (bool) {
+        return (auctionStartTime + timeBetweenSells * totalToSell >
+            block.timestamp);
+    }
 
     ///@notice Get the number of bids
     function noOfBids() public view returns (uint256) {

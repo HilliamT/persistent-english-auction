@@ -91,14 +91,11 @@ contract PersistentEnglishTest is DSTest {
     }
 
     function testLazyEvaluatedSale() public {
-        vm.warp(0);
-
         auction.bid{value: 0.01 ether}();
         auction.bid{value: 0.02 ether}();
         assertEq(auction.noOfBids(), 2);
 
-        vm.warp((TIME_BETWEEN_SELLS * 5) / 2);
-
+        vm.warp(block.timestamp + TIME_BETWEEN_SELLS * 2);
         auction.bid{value: 0.03 ether}();
 
         assertEq(auction.noOfBids(), 1);
@@ -108,14 +105,22 @@ contract PersistentEnglishTest is DSTest {
         assertEq(auction.averageSale(), 0.015 ether);
 
         auction.bid{value: 0.06 ether}();
-        vm.warp((TIME_BETWEEN_SELLS * 7) / 2);
+        vm.warp(block.timestamp + TIME_BETWEEN_SELLS * 3);
+
+        assertEq(auction.noOfBids(), 2);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 2);
+        assertEq(auction.getAmountWon(), 2);
+        assertEq(auction.totalSold(), 2);
+        assertEq(auction.averageSale(), 0.015 ether);
+
+        auction.claim();
 
         assertEq(auction.noOfBids(), 1);
         assertEq(auction.getBidsFromAddress(address(this)).length, 1);
         assertEq(auction.getAmountWon(), 3);
         assertEq(auction.totalSold(), 3);
-        // Note: 0.06 eth bid is not included in the processed clearing round
-        assertEq(auction.averageSale(), 0.02 ether);
+        // Note: 0.01 eth + 0.02 eth + 0.06 eth
+        assertEq(auction.averageSale(), 0.03 ether);
     }
 
     // Needed to accept refunds upon calling `auction.claim`
