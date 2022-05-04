@@ -28,21 +28,37 @@ contract PersistentEnglishTest is DSTest {
     }
 
     function testCanBidMultipleTimes() public {
+        assertEq(auction.noOfBids(), 0);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 0);
+        assertEq(auction.totalSold(), 0);
+        assertEq(auction.averageSale(), 0);
+
         auction.bid{value: 0.01 ether}();
         assertEq(auction.noOfBids(), 1);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 1);
+        assertEq(auction.totalSold(), 0);
+        assertEq(auction.averageSale(), 0);
 
         auction.bid{value: 0.01 ether}();
         assertEq(auction.noOfBids(), 2);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 2);
+        assertEq(auction.totalSold(), 0);
+        assertEq(auction.averageSale(), 0);
 
         auction.bid{value: 0.02 ether}();
         assertEq(auction.noOfBids(), 3);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 3);
+        assertEq(auction.totalSold(), 0);
+        assertEq(auction.averageSale(), 0);
     }
 
     function testClosingAuctionWithZeroBids() public {
         auction.claim();
 
         assertEq(auction.noOfBids(), 0);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 0);
         assertEq(auction.totalSold(), 0);
+        assertEq(auction.averageSale(), 0);
     }
 
     function testClosingAuctionWithMoreThanEnoughBids() public {
@@ -55,6 +71,8 @@ contract PersistentEnglishTest is DSTest {
         auction.claim();
 
         assertEq(auction.noOfBids(), 2);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 2);
+        assertEq(auction.getAmountWon(), 3);
         assertEq(auction.totalSold(), TOTAL_TO_SELL);
         assertEq(auction.averageSale(), 0.04 ether);
     }
@@ -66,6 +84,8 @@ contract PersistentEnglishTest is DSTest {
         auction.claim();
 
         assertEq(auction.noOfBids(), 0);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 0);
+        assertEq(auction.getAmountWon(), 2);
         assertEq(auction.totalSold(), 2);
         assertEq(auction.averageSale(), 0.015 ether);
     }
@@ -82,8 +102,20 @@ contract PersistentEnglishTest is DSTest {
         auction.bid{value: 0.03 ether}();
 
         assertEq(auction.noOfBids(), 1);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 1);
+        assertEq(auction.getAmountWon(), 2);
         assertEq(auction.totalSold(), 2);
         assertEq(auction.averageSale(), 0.015 ether);
+
+        auction.bid{value: 0.06 ether}();
+        vm.warp((TIME_BETWEEN_SELLS * 7) / 2);
+
+        assertEq(auction.noOfBids(), 1);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 1);
+        assertEq(auction.getAmountWon(), 3);
+        assertEq(auction.totalSold(), 3);
+        // Note: 0.06 eth bid is not included in the processed clearing round
+        assertEq(auction.averageSale(), 0.02 ether);
     }
 
     // Needed to accept refunds upon calling `auction.claim`
