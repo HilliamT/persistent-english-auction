@@ -64,7 +64,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
 
     ///@notice Bid on the auction
     function bid() public payable {
-        require(isOver(), "Auction has ended");
+        require(!isOver(), "Auction has ended");
 
         // Accept bids that will have won a previous clearing round e.g
         // If a persistent English auction is to sell NFTs at a rate of
@@ -120,8 +120,8 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
 
     ///@notice Is the auction over?
     function isOver() public view returns (bool) {
-        return (auctionStartTime + timeBetweenSells * totalToSell >
-            block.timestamp);
+        return (auctionStartTime + timeBetweenSells * totalToSell <=
+            uint256(block.timestamp));
     }
 
     ///@notice Get the number of bids
@@ -146,12 +146,24 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
 
     ///@notice Get the total amount of winning bids for this address
     function getAmountWon() public view returns (uint256) {
-        return amountWon[msg.sender];
+        uint256 pendingWins = 0;
+        Bid[] memory winningBids = getTopPendingWinningBids();
+
+        for (uint256 i = 0; i < winningBids.length; i++) {
+            if (winningBids[i].bidder == msg.sender) {
+                pendingWins += 1;
+            }
+        }
+
+        return amountWon[msg.sender] + pendingWins;
     }
 
     ///@notice Get the total amount of tokens sold
     function totalSold() public view returns (uint256) {
-        return totalToSell - remainingToSell;
+        return
+            totalToSell -
+            remainingToSell +
+            (isOver() ? getTopPendingWinningBids().length : 0);
     }
 
     ///@notice Get the total amount of tokens remaining to be sold
@@ -160,7 +172,57 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
             return 0;
         }
 
-        return revenue / totalSold();
+        uint256 totalRevenue = revenue;
+
+        // If the auction is over, we need to add on additional revenue
+        Bid[] memory pendingWinningBids = getTopPendingWinningBids();
+        for (uint256 i = 0; i < pendingWinningBids.length; i++) {
+            totalRevenue += pendingWinningBids[i].amount;
+        }
+
+        return totalRevenue / totalSold();
+    }
+
+    ///@notice Get the top bids for tokens remaining to be sold
+    ///@dev Only made to be used in (external) view functions
+    function getTopPendingWinningBids() public view returns (Bid[] memory) {
+        Bid[] memory pendingWinningBids = new Bid[](remainingToSell);
+        uint256[] memory indicesOfWinningBids = new uint256[](remainingToSell);
+
+        // If
+        if (!isOver() || remainingToSell == 0) {
+            return pendingWinningBids;
+        }
+
+        for (uint256 i = 0; i < remainingToSell && i < bids.length; i++) {
+            uint256 currentHighestBid = 0;
+            uint256 currentHighestBidIndex = 0;
+
+            // Get the top bid that is not already winning
+            for (uint256 j = 0; j < bids.length; j++) {
+                if (bids[j].amount > currentHighestBid) {
+                    // Check that it is not a winning bid already
+                    bool alreadyWinning = false;
+                    for (uint256 k = 0; k < i; k++) {
+                        if (j == indicesOfWinningBids[k]) {
+                            alreadyWinning = true;
+                            break;
+                        }
+                    }
+
+                    if (!alreadyWinning) {
+                        currentHighestBid = bids[j].amount;
+                        currentHighestBidIndex = j;
+                    }
+                }
+            }
+
+            // Add the winning bid to the list of winning bids
+            indicesOfWinningBids[i] = currentHighestBidIndex;
+            pendingWinningBids[i] = bids[currentHighestBidIndex];
+        }
+
+        return pendingWinningBids;
     }
 
     /*//////////////////////////////////////////////////////////////

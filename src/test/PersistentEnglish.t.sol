@@ -14,6 +14,7 @@ contract PersistentEnglishTest is DSTest {
     uint32 TIME_BETWEEN_SELLS = 2;
 
     function setUp() public {
+        vm.warp(0);
         auction = new MockPersistentEnglish(
             "PersistentEnglish",
             "PEA",
@@ -32,24 +33,28 @@ contract PersistentEnglishTest is DSTest {
         assertEq(auction.getBidsFromAddress(address(this)).length, 0);
         assertEq(auction.totalSold(), 0);
         assertEq(auction.averageSale(), 0);
+        assertTrue(!auction.isOver());
 
         auction.bid{value: 0.01 ether}();
         assertEq(auction.noOfBids(), 1);
         assertEq(auction.getBidsFromAddress(address(this)).length, 1);
         assertEq(auction.totalSold(), 0);
         assertEq(auction.averageSale(), 0);
+        assertTrue(!auction.isOver());
 
         auction.bid{value: 0.01 ether}();
         assertEq(auction.noOfBids(), 2);
         assertEq(auction.getBidsFromAddress(address(this)).length, 2);
         assertEq(auction.totalSold(), 0);
         assertEq(auction.averageSale(), 0);
+        assertTrue(!auction.isOver());
 
         auction.bid{value: 0.02 ether}();
         assertEq(auction.noOfBids(), 3);
         assertEq(auction.getBidsFromAddress(address(this)).length, 3);
         assertEq(auction.totalSold(), 0);
         assertEq(auction.averageSale(), 0);
+        assertTrue(!auction.isOver());
     }
 
     function testClosingAuctionWithZeroBids() public {
@@ -105,13 +110,23 @@ contract PersistentEnglishTest is DSTest {
         assertEq(auction.averageSale(), 0.015 ether);
 
         auction.bid{value: 0.06 ether}();
-        vm.warp(block.timestamp + TIME_BETWEEN_SELLS * 3);
 
         assertEq(auction.noOfBids(), 2);
         assertEq(auction.getBidsFromAddress(address(this)).length, 2);
         assertEq(auction.getAmountWon(), 2);
         assertEq(auction.totalSold(), 2);
         assertEq(auction.averageSale(), 0.015 ether);
+
+        vm.warp(block.timestamp + TIME_BETWEEN_SELLS * 3);
+
+        assertTrue(auction.isOver());
+
+        assertEq(auction.noOfBids(), 2);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 2);
+        assertEq(auction.getAmountWon(), 3);
+        assertEq(auction.totalSold(), 3);
+        // Note: 0.01 eth + 0.02 eth + 0.06 eth
+        assertEq(auction.averageSale(), 0.03 ether);
 
         auction.claim();
 
