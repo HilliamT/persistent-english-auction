@@ -138,6 +138,41 @@ contract PersistentEnglishTest is DSTest {
         assertEq(auction.averageSale(), 0.03 ether);
     }
 
+    function testCantRefundTwice() public {
+        uint256 toBeRefunded = 0.1 ether;
+
+        auction.bid{value: toBeRefunded}();
+        auction.bid{value: 0.3 ether}();
+        auction.bid{value: 0.3 ether}();
+        auction.bid{value: 0.3 ether}();
+
+        vm.warp(block.timestamp + TIME_BETWEEN_SELLS * 3);
+        assertTrue(auction.isOver());
+
+        uint256 beforeBalance = address(this).balance;
+
+        auction.claim();
+
+        assertEq(auction.noOfBids(), 1);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 1);
+        assertEq(auction.getAmountWon(), 3);
+        assertEq(auction.totalSold(), 3);
+        assertEq(auction.averageSale(), 0.3 ether);
+
+        uint256 balanceAfterFirstClaim = address(this).balance;
+        assertTrue(balanceAfterFirstClaim > beforeBalance);
+
+        auction.claim();
+
+        assertEq(auction.noOfBids(), 1);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 1);
+        assertEq(auction.getAmountWon(), 3);
+        assertEq(auction.totalSold(), 3);
+        assertEq(auction.averageSale(), 0.3 ether);
+
+        assertTrue(address(this).balance <= balanceAfterFirstClaim);
+    }
+
     // Needed to accept refunds upon calling `auction.claim`
     fallback() external payable {}
 }

@@ -33,6 +33,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
     ///@notice Amount of tokens sold to each bidder
     mapping(address => uint16) internal amountWon;
     mapping(address => uint16) internal amountMinted;
+    mapping(address => bool) internal beenRefunded;
 
     uint256 public immutable auctionStartTime;
     uint32 public immutable totalToSell;
@@ -99,7 +100,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         // successful. This could be done as a separate call,
         // but we do it here for simplicity and to avoid
         // having to pay more gas with another transaction.
-        if (isOver()) {
+        if (isOver() && !beenRefunded[msg.sender]) {
             uint256 refund = 0;
 
             // We can assume here that any bid that has not
@@ -113,6 +114,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
             }
 
             // Refund the totalClaim
+            beenRefunded[msg.sender] = true;
             (bool sent, ) = msg.sender.call{value: refund}("");
             require(sent, "Could not send refund");
         }
