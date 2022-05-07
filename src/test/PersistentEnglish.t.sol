@@ -148,6 +148,7 @@ contract PersistentEnglishTest is DSTest {
 
         vm.warp(block.timestamp + TIME_BETWEEN_SELLS * 3);
         assertTrue(auction.isOver());
+        assertTrue(!auction.hasBeenRefunded());
 
         uint256 beforeBalance = address(this).balance;
 
@@ -158,6 +159,7 @@ contract PersistentEnglishTest is DSTest {
         assertEq(auction.getAmountWon(), 3);
         assertEq(auction.totalSold(), 3);
         assertEq(auction.averageSale(), 0.3 ether);
+        assertTrue(auction.hasBeenRefunded());
 
         uint256 balanceAfterFirstClaim = address(this).balance;
         assertTrue(balanceAfterFirstClaim > beforeBalance);
@@ -169,6 +171,7 @@ contract PersistentEnglishTest is DSTest {
         assertEq(auction.getAmountWon(), 3);
         assertEq(auction.totalSold(), 3);
         assertEq(auction.averageSale(), 0.3 ether);
+        assertTrue(auction.hasBeenRefunded());
 
         assertTrue(address(this).balance <= balanceAfterFirstClaim);
     }

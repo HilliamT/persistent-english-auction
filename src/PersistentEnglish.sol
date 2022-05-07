@@ -177,6 +177,11 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         return amountWon[msg.sender] + pendingWins;
     }
 
+    ///@notice Has the user claimed their refund for unsuccessful bids?
+    function hasBeenRefunded() public view returns (bool) {
+        return beenRefunded[msg.sender];
+    }
+
     ///@notice Get the total amount of tokens sold
     function totalSold() public view returns (uint256) {
         return
