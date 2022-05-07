@@ -54,7 +54,6 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         auctionStartTime = uint256(block.timestamp);
         totalToSell = _totalToSell;
         timeBetweenSells = _timeBetweenSells;
-
         remainingToSell = _totalToSell;
     }
 
@@ -86,13 +85,27 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
 
     ///@notice Claim mint and/or refund
     function claim() public {
-        // For any unresolved clearing rounds, process
+        // For any unresolved clearing rounds, we process
+        // these bids now. This allows us to update
+        // the auction state lazily without having to
+        // send a separate transaction that needs to be
+        // scheduled.
         while (bids.length > 0 && remainingToSell > 0) {
             _takeTopBid();
         }
 
+        // If the auction has ended, we allow for them
+        // to claim a refund for the bids that were not
+        // successful. This could be done as a separate call,
+        // but we do it here for simplicity and to avoid
+        // having to pay more gas with another transaction.
         if (isOver()) {
             uint256 refund = 0;
+
+            // We can assume here that any bid that has not
+            // been processed above by _takeTopBid is a bid that
+            // has been unsuccessful in winning a mint. As such,
+            // we can simply compute the total of the refund to give.
             for (uint256 i = 0; i < bids.length; i++) {
                 if (bids[i].bidder == msg.sender) {
                     refund += bids[i].amount;
@@ -104,6 +117,10 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
             require(sent, "Could not send refund");
         }
 
+        // If a user has won a mint at any point in the auction,
+        // they are able to claim it immediately. It is recommended
+        // to claim after the auction has ended to save on gas, but
+        // for those that don't want to wait, we do it here.
         for (
             uint256 i = 0;
             i < amountWon[msg.sender] - amountMinted[msg.sender];
@@ -184,16 +201,18 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
     }
 
     ///@notice Get the top bids for tokens remaining to be sold
-    ///@dev Only made to be used in (external) view functions
+    ///@dev Only made to be used in (external) view functions due to the cost
     function getTopPendingWinningBids() public view returns (Bid[] memory) {
         Bid[] memory pendingWinningBids = new Bid[](remainingToSell);
         uint256[] memory indicesOfWinningBids = new uint256[](remainingToSell);
 
-        // If
+        // If the auction is not over, we can simply return an empty array
         if (!isOver() || remainingToSell == 0) {
             return pendingWinningBids;
         }
 
+        // Iterate through all bids and find the top bids that have not been
+        // taken yet, but would if _takeTopBid were called.
         for (uint256 i = 0; i < remainingToSell && i < bids.length; i++) {
             uint256 currentHighestBid = 0;
             uint256 currentHighestBidIndex = 0;
