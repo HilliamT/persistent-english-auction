@@ -16,10 +16,8 @@ class PersistentEnglishAuction:
         self.active = time.time() > auction_start_time
         
     def add_bid(self, address, bid, bid_time = time.time()):
-        if not self.active:
-            return
         
-        while len(self.bids) > 0 and self.max_clearings > len(self.winners) and bid_time - len(self.winners) * self.time_between_clearings > self.auction_start_time:
+        while len(self.bids) > 0 and self.max_clearings > len(self.winners) and bid_time - len(self.winners) * self.time_between_clearings >= self.auction_start_time:
             self.winners.append(heapq.heappop(self.bids))
         
         # Add bid to the heap
