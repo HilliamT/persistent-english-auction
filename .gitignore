@@ -1,4 +1,7 @@
-out/
-cache/
 node_modules/
 .env
+
+# Foundry Byproduct Files
+out/
+cache/
+.gas-snapshot
