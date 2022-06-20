@@ -21,18 +21,16 @@ npm install ## install development dependencies
 forge build
 forge test
 ```
-## Changes to Make
 
-### Contract
-- [x] Contract should be made abstract. This will require updating the usage of the contract in tests.
-- [x] Contract can be a `ERC721` itself.
-- [x] Currently, when the auction is to close, the last NFT does not get allocated to a bidder until the auction operator calls `closeAuction`. This also prevents minting and refunds to be processed as only the operator can make the auction inactive. This is not ideal.
-- [x] Test view functions
-- [ ] Fuzzing
-### Simulation
-- [ ] Translate updated contract logic into simulated class
-- [ ] Simulate bids being made at random intervals via distribution
-- [ ] Compute revenue and potential maximum revenue
+## "Next Bid Wins" and "Propagate to Next Round"
+
+If an auction round does not contain any bids to choose as the winner, we have two approaches that can be used to resolve this.
+
+* **Next Bid Wins** - One solution is to immediately accept the next bid made. This ensures that within one bid, the item is sold. We note that this bid is automatically made inactive and thus can not win multiple items with a single bid. Through this method, it is possible for a bidder to pay zero as to maximise their utility gain. It can be argued that if no bids were placed by willing bidders, the value of the item could be zero by nature. This situation may also occur if all honest and colluding auction participants perceive that it is better to not bid within the auction round and win by placing the next bid with a bid amount of 0 - this can lead to zero value capture by the auctioneer.
+
+* **Propagate To Next Round** - Another solution is to select an additional winner or winners at the end of the following round. Should an insufficient amount of bids be place in the following round, the remaining number of additional winners to pick is further propagated to further rounds. This can prove to be a fairer system that does not rely on placing the first bid to win - auction participants are given the duration of a round to respond to no bids being placed in the previous round.
+
+Both implementations are provided, within `src/PersistentEnglish.sol` and `src/PersistentEnglishPropagation.sol` respectively.
 
 ## Resources
 Below are a list of helpful resources that have helped me develop this idea.
