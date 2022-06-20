@@ -78,7 +78,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
                 timeBetweenSells >
             auctionStartTime
         ) {
-            _takeTopBid();
+            _acceptTopBid();
         }
 
         _addBid(msg.sender, msg.value);
@@ -92,7 +92,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         // send a separate transaction that needs to be
         // scheduled.
         while (bids.length > 0 && remainingToSell > 0) {
-            _takeTopBid();
+            _acceptTopBid();
         }
 
         // If the auction has ended, we allow for them
@@ -104,7 +104,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
             uint256 refund = 0;
 
             // We can assume here that any bid that has not
-            // been processed above by _takeTopBid is a bid that
+            // been processed above by _acceptTopBid is a bid that
             // has been unsuccessful in winning a mint. As such,
             // we can simply compute the total of the refund to give.
             for (uint256 i = 0; i < bids.length; i++) {
@@ -223,7 +223,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
         }
 
         // Iterate through all bids and find the top bids that have not been
-        // taken yet, but would if _takeTopBid were called.
+        // taken yet, but would if _acceptTopBid were called.
         for (uint256 i = 0; i < bidsToChoose; i++) {
             uint256 currentHighestBid = 0;
             uint256 currentHighestBidIndex = 0;
@@ -280,7 +280,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
     }
 
     ///@notice Extract the largest bid
-    function _takeTopBid() private {
+    function _acceptTopBid() private {
         uint256 winningIndex = _getWinningIndex();
 
         // remove the highest bid from the list by replacing it with the last bid
