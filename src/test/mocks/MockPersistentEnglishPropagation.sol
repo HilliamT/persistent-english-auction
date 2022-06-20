@@ -3,7 +3,7 @@ pragma solidity >=0.8.0;
 
 import {PersistentEnglishPropagation} from "../../PersistentEnglishPropagation.sol";
 
-contract MockPersistentEnglish is PersistentEnglishPropagation {
+contract MockPersistentEnglishPropagation is PersistentEnglishPropagation {
     /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/

@@ -4,18 +4,18 @@ pragma solidity >=0.8.0;
 import {DSTest} from "ds-test/test.sol";
 import {Vm} from "forge-std/Vm.sol";
 
-import {MockPersistentEnglish} from "./mocks/MockPersistentEnglishPropagation.sol";
+import {MockPersistentEnglishPropagation} from "./mocks/MockPersistentEnglishPropagation.sol";
 
 contract PersistentEnglishPropagationTest is DSTest {
     Vm internal immutable vm = Vm(HEVM_ADDRESS);
 
-    MockPersistentEnglish internal auction;
+    MockPersistentEnglishPropagation internal auction;
     uint32 TOTAL_TO_SELL = 3;
     uint32 TIME_BETWEEN_SELLS = 2;
 
     function setUp() public {
         vm.warp(0);
-        auction = new MockPersistentEnglish(
+        auction = new MockPersistentEnglishPropagation(
             "PersistentEnglish",
             "PEA",
             TOTAL_TO_SELL,
