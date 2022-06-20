@@ -93,6 +93,14 @@ contract PersistentEnglishTest is DSTest {
         assertEq(auction.getAmountWon(), 2);
         assertEq(auction.totalSold(), 2);
         assertEq(auction.averageSale(), 0.015 ether);
+
+        vm.warp(block.timestamp + TIME_BETWEEN_SELLS * TOTAL_TO_SELL + 1);
+
+        assertEq(auction.noOfBids(), 0);
+        assertEq(auction.getBidsFromAddress(address(this)).length, 0);
+        assertEq(auction.getAmountWon(), 2);
+        assertEq(auction.totalSold(), 2);
+        assertEq(auction.averageSale(), 0.015 ether);
     }
 
     function testLazyEvaluatedSale() public {

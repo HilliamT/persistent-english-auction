@@ -210,8 +210,12 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
     ///@notice Get the top bids for tokens remaining to be sold
     ///@dev Only made to be used in (external) view functions due to the cost
     function getTopPendingWinningBids() public view returns (Bid[] memory) {
-        Bid[] memory pendingWinningBids = new Bid[](remainingToSell);
-        uint256[] memory indicesOfWinningBids = new uint256[](remainingToSell);
+        uint256 bidsToChoose = remainingToSell > bids.length
+            ? bids.length
+            : remainingToSell;
+
+        Bid[] memory pendingWinningBids = new Bid[](bidsToChoose);
+        uint256[] memory indicesOfWinningBids = new uint256[](bidsToChoose);
 
         // If the auction is not over, we can simply return an empty array
         if (!isOver() || remainingToSell == 0) {
@@ -220,7 +224,7 @@ abstract contract PersistentEnglish is Ownable, ERC721 {
 
         // Iterate through all bids and find the top bids that have not been
         // taken yet, but would if _takeTopBid were called.
-        for (uint256 i = 0; i < remainingToSell && i < bids.length; i++) {
+        for (uint256 i = 0; i < bidsToChoose; i++) {
             uint256 currentHighestBid = 0;
             uint256 currentHighestBidIndex = 0;
 
